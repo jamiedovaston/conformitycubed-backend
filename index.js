@@ -4,14 +4,18 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 
+const { getOrCreateUser } = require('./services/users');
+
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(session({ 
+app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 30 },
+    rolling: true
 }));
 
 const PORT = process.env.PORT;
@@ -53,17 +57,35 @@ app.post('/auth', async (req, res) => {
             return res.status(401).json({ error: 'Invalid Steam ticket' });
 
         const steamId = data.response.params.steamid;
+        const { isNewUser } = await getOrCreateUser(steamId);
 
         req.session.steamId = steamId;
 
         return res.json({
-            success: true,
-            steamId
+            steamId,
+            isNewUser
         });
     }
     catch(err) {
         console.error(err);
         return res.status(500).json({ error: 'Steam authentication failed' });
-
     }
+});
+
+app.post('/end-session', (req, res) => {
+    if (!req.session.steamId) {
+        return res.status(401).json({ error: "No active session" });
+    }
+
+    const steamId = req.session.steamId;
+
+    req.session.destroy(err => {
+        if (err) {
+            console.error("Session destroy error:", err);
+            return res.status(500).json({ error: "Failed to end session" });
+        }
+
+        res.clearCookie('connect.sid');
+        return res.json();
+    });
 });
