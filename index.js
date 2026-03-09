@@ -5,6 +5,7 @@ const cors = require('cors');
 const session = require('express-session');
 
 const { getOrCreateUser } = require('./services/users');
+const { uploadLevel } = require('./services/level');
 
 const app = express();
 
@@ -19,9 +20,10 @@ app.use(session({
 }));
 
 const PORT = process.env.PORT;
+const IP = process.env.IP;
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, IP, () => {
+    console.log(`Server running on http://${IP}:${PORT}`);
 });
 
 app.get('/ping', (req, res) => {
@@ -88,4 +90,35 @@ app.post('/end-session', (req, res) => {
         res.clearCookie('connect.sid');
         return res.json();
     });
+});
+
+app.post('/levels/upload', async (req, res) => {
+
+    if (!req.session.steamId)
+        return res.status(401).json({ error: "Not authenticated" });
+
+    const { name, description, tags, level } = req.body;
+
+    if (!name || !level)
+        return res.status(400).json({ error: "Missing required fields" });
+
+    try {
+
+        const result = await uploadLevel(
+            req.session.steamId,
+            name,
+            description,
+            tags,
+            level
+        );
+
+        res.json({
+            success: true,
+            levelId: result.id
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to upload level" });
+    }
 });
