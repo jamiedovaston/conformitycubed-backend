@@ -29,11 +29,7 @@ async function getSteamProfile(steamId)
 
     const data = await response.json();
 
-    const player = data.response.players[0];
-
-    return {
-        player
-    };
+    return data.response.players[0];
 }
 
-module.exports = { getOrCreateUser };
+module.exports = { getOrCreateUser, getSteamProfile };

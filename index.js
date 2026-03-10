@@ -68,8 +68,8 @@ app.post('/auth', async (req, res) => {
 
         const user = {
             steamId,
-            username: profile.username,
-            avatar: profile.avatarfull,
+            username: profile.personaname,
+            avatar: profile.avatarmedium,
             isNewUser
         };
 
