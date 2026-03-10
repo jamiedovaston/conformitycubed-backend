@@ -60,13 +60,21 @@ app.post('/auth', async (req, res) => {
 
         const steamId = data.response.params.steamid;
         const { isNewUser } = await getOrCreateUser(steamId);
+        
+        const profile = await getSteamProfile(steamId);
 
         req.session.steamId = steamId;
 
-        return res.json({
+        const user = {
             steamId,
+            username: profile.username,
+            avatar: profile.avatarfull,
             isNewUser
-        });
+        };
+
+        console.log(user);
+
+        return res.json(user);
     }
     catch(err) {
         console.error(err);

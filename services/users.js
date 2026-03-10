@@ -16,4 +16,24 @@ async function getOrCreateUser(steamId) {
     };
 }
 
+async function getSteamProfile(steamId)
+{
+    const params = new URLSearchParams({
+        key: process.env.STEAM_PUBLISHER_KEY,
+        steamids: steamId
+    });
+
+    const response = await fetch(
+        `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?${params}`
+    );
+
+    const data = await response.json();
+
+    const player = data.response.players[0];
+
+    return {
+        player
+    };
+}
+
 module.exports = { getOrCreateUser };
