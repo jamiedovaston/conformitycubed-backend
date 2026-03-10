@@ -5,6 +5,7 @@ const cors = require('cors');
 const session = require('express-session');
 
 const { getOrCreateUser } = require('./services/users');
+const { getSteamProfile } = require('./services/users');
 const { uploadLevel } = require('./services/level');
 
 const app = express();
