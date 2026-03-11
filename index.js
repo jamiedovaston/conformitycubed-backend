@@ -8,6 +8,8 @@ const { getOrCreateUser } = require('./services/users');
 const { getSteamProfile } = require('./services/users');
 const { uploadLevel } = require('./services/level');
 
+const levelRoute = require('./routes/levelRoute');
+
 const app = express();
 
 app.use(express.json());
@@ -101,33 +103,4 @@ app.post('/end-session', (req, res) => {
     });
 });
 
-app.post('/levels/upload', async (req, res) => {
-
-    if (!req.session.steamId)
-        return res.status(401).json({ error: "Not authenticated" });
-
-    const { name, description, tags, level } = req.body;
-
-    if (!name || !level)
-        return res.status(400).json({ error: "Missing required fields" });
-
-    try {
-
-        const result = await uploadLevel(
-            req.session.steamId,
-            name,
-            description,
-            tags,
-            level
-        );
-
-        res.json({
-            success: true,
-            levelId: result.id
-        });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Failed to upload level" });
-    }
-});
+app.use('/levels', levelRoute);
