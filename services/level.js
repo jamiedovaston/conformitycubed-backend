@@ -27,7 +27,7 @@ async function getAllLevels() {
 async function getLevel(id) {
 
     const result = await pool.query(
-        `SELECT id, steam_id, name, description, tags, level, created_at
+        `SELECT id, steam_id, name, description, tags, level_data, created_at
          FROM levels
          WHERE id = $1`,
         [id]
