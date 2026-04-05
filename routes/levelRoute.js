@@ -1,4 +1,4 @@
-const { getAllLevels, uploadLevel } = require("../services/level");
+const { getAllLevels, uploadLevel, getLevel } = require("../services/level");
 
 const express = require('express');
 const router = express.Router();
