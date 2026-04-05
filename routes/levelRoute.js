@@ -35,16 +35,28 @@ router.post('/upload', async (req, res) => {
 
 router.get('/get', async (req, res) => {
     try {
+        const { id } = req.query;
+
+        if (id) {
+            const level = await getLevel(id);
+
+            if (!level) {
+                return res.status(404).json({ error: "Level not found" });
+            }
+
+            return res.json({ level });
+        }
+
         const levels = await getAllLevels();
 
-        res.json({
-            levels
-        });
+        res.json({ levels });
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Failed to get all levels" });
+        res.status(500).json({ error: "Failed to get levels" });
     }
 });
+
+
 
 module.exports = router;

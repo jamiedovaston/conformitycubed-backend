@@ -23,4 +23,17 @@ async function getAllLevels() {
     return result.rows;
 }
 
-module.exports = { uploadLevel, getAllLevels };
+
+async function getLevel(id) {
+
+    const result = await pool.query(
+        `SELECT id, steam_id, name, description, tags, level_data, created_at
+         FROM levels
+         WHERE id = $1`,
+        [id]
+    );
+
+    return result.rows[0];
+}
+
+module.exports = { uploadLevel, getAllLevels, getLevel };
